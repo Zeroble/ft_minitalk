@@ -15,34 +15,28 @@
 #include <unistd.h>
 #include <stdio.h>
 
-int main(int argc, char const *argv[])
+int	main(int argc, char const *argv[])
 {
 	int	flag;
 	int	server_pid;
-	int	cur = 0;
-	int	cur2;
+	int	cur;
+	int	binary_cur;
 
 	if (argc != 3)
 		exit(-1);
+	cur = 0;
 	server_pid = ft_atoi(argv[1], &flag);
 	while (argv[2][cur] != 0)
 	{
-		cur2 = 7;
-		// printf("\n%c", argv[2][cur]);
-		while (cur2 >= 0)
+		binary_cur = 7;
+		while (binary_cur >= 0)
 		{
-			if (((argv[2][cur] >> cur2 ) & 1) == 0)
-			{
+			if (((argv[2][cur] >> binary_cur) & 1) == 0)
 				kill(server_pid, SIGUSR1);
-				// printf("0");
-			}
 			else
-			{
 				kill(server_pid, SIGUSR2);
-				// printf("1");
-			}
 			usleep(100);
-			cur2 -= 1;
+			binary_cur -= 1;
 		}
 		cur += 1;
 	}

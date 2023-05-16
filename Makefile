@@ -1,4 +1,4 @@
-SERVER_OBJ =	server.o
+SERVER_OBJ =	server2.o
 
 CLIENT_OBJ =	client.o \
 				atoi.o
