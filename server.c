@@ -87,7 +87,6 @@ int	convert_base(int number, char *obases, char obase)
 	}
 }
 
-
 int	print_number(int number, char *obases, char obase)
 {
 	int	ret;

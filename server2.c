@@ -15,16 +15,15 @@
 #include <signal.h>
 #include <stdlib.h>
 
-char tmp;
+char	g_revive_char;
 
 int	convert_base(int number, char *obases, char obase);
 int	print_number(int number, char *obases, char obase);
 
 void	set_bit(char *ptr, short value)
 {
-	static int idx = 7;
+	static int	idx = 7;
 
-	// printf("sig val : %d, idx : %d\n", value, idx);
 	if (idx == -1)
 		idx = 7;
 	if (value == 1)
@@ -32,16 +31,20 @@ void	set_bit(char *ptr, short value)
 	else
 		(*ptr) &= ~(1 << idx);
 	if (idx == 0)
-		write(1, &tmp, 1);
+		write(1, &g_revive_char, 1);
 	idx -= 1;
 }
 
-void	handler(int sig)
+void	handler(int sig, siginfo_t *info, void *context)
 {
 	if (sig == SIGUSR1)
-		set_bit(&tmp, 0);
+		set_bit(&g_revive_char, 0);
 	else if (sig == SIGUSR2)
-		set_bit(&tmp, 1);
+		set_bit(&g_revive_char, 1);
+	// print_number(info->si_pid, "0123456789", 10);
+	// write(1, "\n", 1);
+	usleep(50);
+	kill(info->si_pid, SIGUSR1);
 }
 
 int	main(void)
@@ -49,17 +52,14 @@ int	main(void)
 	struct sigaction	act;
 
 	print_number(getpid(), "0123456789", 10);
-	act.sa_handler = handler;
+	act.sa_sigaction = handler;
 	sigemptyset(&act.sa_mask);
-	act.sa_flags = 0;
+	act.sa_flags = SA_SIGINFO;
 	write(1, "\n", 1);
+	sigaction(SIGUSR1, &act, 0);
+	sigaction(SIGUSR2, &act, 0);
 	while (1)
-	{
-		if (sigaction(SIGUSR1, &act, 0) == SIG_ERR)
-			exit(1);
-		if (sigaction(SIGUSR2, &act, 0) == SIG_ERR)
-			exit(1);
-	}
+		pause();
 }
 
 int	convert_base(int number, char *obases, char obase)
@@ -67,19 +67,18 @@ int	convert_base(int number, char *obases, char obase)
 	int	ret;
 
 	ret = 0;
-	if (number/obase == 0)
+	if (number / obase == 0)
 	{
 		ret += write(1, &obases[number], 1);
 		return (ret);
 	}
 	else
 	{
-		ret = convert_base(number/obase, obases, obase);
-		ret += write(1, &obases[number%obase], 1);
+		ret = convert_base(number / obase, obases, obase);
+		ret += write(1, &obases[number % obase], 1);
 		return (ret);
 	}
 }
-
 
 int	print_number(int number, char *obases, char obase)
 {

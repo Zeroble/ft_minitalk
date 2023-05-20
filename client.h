@@ -16,6 +16,14 @@
 # include <stdlib.h>
 # include <unistd.h>
 
-	int	ft_atoi(const char *c, int *sign);
+typedef struct s_message_info
+{
+	int		binary_cur;
+	int		char_cur;
+	int		server_pid;
+	char	*message;
+}	t_message_info;
+
+int	ft_atoi(const char *c, int *sign);
 
 #endif

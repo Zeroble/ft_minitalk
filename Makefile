@@ -1,6 +1,6 @@
 SERVER_OBJ =	server2.o
 
-CLIENT_OBJ =	client.o \
+CLIENT_OBJ =	client2.o \
 				atoi.o
 
 CC = cc
