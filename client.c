@@ -11,34 +11,67 @@
 /* ************************************************************************** */
 
 #include "client.h"
-#include <signal.h>
-#include <unistd.h>
-#include <stdio.h>
 
-int	main(int argc, char const *argv[])
+t_message_info	g_minfo;
+
+void	sned_bit(void);
+
+void	handler(int sig, siginfo_t *info, void *context)
 {
-	int	flag;
-	int	server_pid;
-	int	cur;
-	int	binary_cur;
+	(void)sig;
+	(void)context;
+	if (g_minfo.server_pid == info->si_pid)
+	{
+		sned_bit();
+	}
+}
+
+void	sned_bit(void)
+{
+	int	pre_bin_cur;
+	int	pre_char_cur;
+
+	if (g_minfo.message[g_minfo.char_cur] == 0)
+	{
+		g_minfo.exit_flag = 0;
+		return ;
+	}
+	pre_bin_cur = g_minfo.binary_cur;
+	pre_char_cur = g_minfo.char_cur;
+	g_minfo.binary_cur -= 1;
+	if (g_minfo.binary_cur == -1)
+	{
+		g_minfo.char_cur += 1;
+		g_minfo.binary_cur = 7;
+	}
+	usleep(50);
+	if (((g_minfo.message[pre_char_cur] >> pre_bin_cur) & 1) == 0)
+		kill(g_minfo.server_pid, SIGUSR1);
+	else
+		kill(g_minfo.server_pid, SIGUSR2);
+}
+
+int	main(int argc, char *argv[])
+{
+	int					atoi_sign;
+	struct sigaction	act;
 
 	if (argc != 3)
 		exit(-1);
-	cur = 0;
-	server_pid = ft_atoi(argv[1], &flag);
-	while (argv[2][cur] != 0)
-	{
-		binary_cur = 7;
-		while (binary_cur >= 0)
-		{
-			if (((argv[2][cur] >> binary_cur) & 1) == 0)
-				kill(server_pid, SIGUSR1);
-			else
-				kill(server_pid, SIGUSR2);
-			usleep(100);
-			binary_cur -= 1;
-		}
-		cur += 1;
-	}
+	g_minfo.exit_flag = 1;
+	g_minfo.server_pid = ft_atoi(argv[1], &atoi_sign);
+	if ((atoi_sign < 0 && g_minfo.server_pid < 0)
+		|| (atoi_sign > 0 && g_minfo.server_pid > 0))
+		exit(-1);
+	g_minfo.char_cur = 0;
+	g_minfo.binary_cur = 7;
+	act.sa_sigaction = handler;
+	act.sa_flags = SA_SIGINFO;
+	g_minfo.message = argv[2];
+	sigaction(SIGUSR1, &act, 0);
+	sigaction(SIGUSR2, &act, 0);
+	sned_bit();
+	while (g_minfo.exit_flag)
+		pause();
 	return (0);
 }

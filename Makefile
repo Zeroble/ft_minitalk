@@ -1,6 +1,6 @@
-SERVER_OBJ =	server2.o
+SERVER_OBJ =	server.o
 
-CLIENT_OBJ =	client2.o \
+CLIENT_OBJ =	client.o \
 				atoi.o
 
 CC = cc
@@ -10,11 +10,11 @@ SERVER_NAME = server
 
 all : ${SERVER_NAME} ${CLIENT_NAME}
 
-# %.o : %.c
-# 	${CC} ${CFLAGS} -c $? -o $@
-
 %.o : %.c
-	${CC} -c $? -o $@
+	${CC} ${CFLAGS} -c $? -o $@
+
+# %.o : %.c
+# 	${CC} -c $? -o $@
 
 $(CLIENT_NAME) : ${CLIENT_OBJ}
 	${CC} $? -o ${CLIENT_NAME}

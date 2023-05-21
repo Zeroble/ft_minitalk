@@ -14,6 +14,7 @@
 # define CLIENT_H
 
 # include <stdlib.h>
+# include <signal.h>
 # include <unistd.h>
 
 typedef struct s_message_info
@@ -21,6 +22,7 @@ typedef struct s_message_info
 	int		binary_cur;
 	int		char_cur;
 	int		server_pid;
+	short	exit_flag;
 	char	*message;
 }	t_message_info;
 
